@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Resolution } from '../db/db';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 
 const emptyRes = (): Omit<Resolution, 'id' | 'meetingId' | 'createdAt'> => ({
   order: 0,

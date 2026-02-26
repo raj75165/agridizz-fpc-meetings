@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 
 interface AuthPageProps {
   onAuthSuccess: () => void;

@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import SignaturePadLib from 'signature_pad';
-import { useLangContext } from './Layout';
+import { useLangContext } from '../context/LangContext';
 
 interface SignaturePadProps {
   onSave: (dataUrl: string) => void;

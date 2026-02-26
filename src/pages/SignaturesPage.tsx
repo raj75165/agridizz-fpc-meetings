@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 import SignaturePad from '../components/SignaturePad';
 
 export default function SignaturesPage() {
@@ -37,10 +37,12 @@ export default function SignaturesPage() {
 
   const handleSave = async (memberId: number, dataUrl: string) => {
     const existing = getSignature(memberId);
+    // eslint-disable-next-line react-hooks/purity
+    const signedAt = Date.now();
     if (existing?.id) {
-      await db.signatures.update(existing.id, { dataUrl, signedAt: Date.now() });
+      await db.signatures.update(existing.id, { dataUrl, signedAt });
     } else {
-      await db.signatures.add({ meetingId, memberId, dataUrl, signedAt: Date.now() });
+      await db.signatures.add({ meetingId, memberId, dataUrl, signedAt });
     }
   };
 

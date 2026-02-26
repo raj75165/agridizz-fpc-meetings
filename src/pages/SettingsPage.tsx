@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../db/db';
 

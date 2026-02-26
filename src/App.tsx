@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { LangContext } from './components/Layout';
+import { LangContext } from './context/LangContext';
 import Layout from './components/Layout';
 import { useLang } from './hooks/useLang';
 import { useAuth } from './hooks/useAuth';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Meeting } from '../db/db';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 import { useAuth } from '../hooks/useAuth';
 import { generateMeetingPdf } from '../components/PdfGenerator';
 

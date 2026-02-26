@@ -1,73 +1,140 @@
-# React + TypeScript + Vite
+# Agridizz FPC Meetings
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Offline-first, installable Progressive Web App (PWA) for Agridizz Farmer Producer Company to manage meeting resolutions with member management, Hindi/English UI toggle, signature capture, A4 PDF generation, audio recording, and JSON backup/restore.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **PIN-based auth** — local 4-digit PIN lock (set on first launch)
+- **Members** — manual entry (name, role: Director/Member, mobile, active status)
+- **Meetings** — Annual / Special / Board meetings with attendance selection
+- **Resolutions** — Hindi + English text per resolution, language toggle, reorder
+- **Signatures** — drawn canvas signatures for Directors + up to 5 selected Members
+- **Audio** — record meeting audio via MediaRecorder, stored offline, playback
+- **Lock/Unlock** — admin can lock a meeting to prevent further edits
+- **PDF generation** — offline A4 PDF with header, attendance, resolutions, signatures
+- **Backup** — export all data as a JSON file; import/restore from JSON
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Node.js** ≥ 18
+- **npm** ≥ 9
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Local Development
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Install dependencies
+npm install
+
+# Start dev server (with HMR)
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+On first launch you will be prompted to set a 4-digit PIN.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Production Build
+
+```bash
+npm run build
 ```
+
+Output is in the `dist/` directory — a fully static site with a service worker.
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+---
+
+## Deploy Options (Static Hosting)
+
+Because the output is a plain static site, you can deploy to any static host:
+
+| Host | Command / Steps |
+|---|---|
+| **GitHub Pages** | Push `dist/` to `gh-pages` branch (e.g. with `gh-pages` npm package) |
+| **Netlify** | Drag-and-drop `dist/` or connect repo; build command `npm run build`, publish dir `dist` |
+| **Vercel** | `vercel --prod` from repo root |
+| **Firebase Hosting** | `firebase deploy` after configuring `public = dist` in `firebase.json` |
+| **Any static server** | Serve `dist/` with nginx / Apache / `npx serve dist` |
+
+> **Important:** Configure your host to serve `index.html` for all routes (SPA fallback), since the app uses a hash-based router this is handled automatically.
+
+---
+
+## Installing as PWA on Android
+
+1. Open the deployed URL in **Chrome** on Android.
+2. Tap the **⋮ menu** → **"Add to Home screen"** (or Chrome shows an install banner).
+3. Tap **Install** / **Add**.
+4. The app icon appears on your home screen and opens in standalone mode.
+
+To install on iOS (Safari):
+
+1. Open the URL in Safari.
+2. Tap the **Share** button → **"Add to Home Screen"**.
+
+---
+
+## Offline Behaviour
+
+The service worker (generated by `vite-plugin-pwa` / Workbox) pre-caches all app assets at install time. After the first load, the entire app — including members, meetings, resolutions, signatures, audio playback, and PDF generation — works with **no internet connection**.
+
+All data is stored in **IndexedDB** (via Dexie) on the device.
+
+---
+
+## Backup Export / Import
+
+### Export (backup to Google Drive)
+
+1. Open the app → **Settings** tab.
+2. Tap **⬇️ Export Data**.
+3. A file named `fpc-backup-YYYY-MM-DD.json` is downloaded to your device.
+4. Open **Google Drive** and upload this file manually.
+
+The JSON contains all members, meetings, resolutions, signatures (as PNG data URLs), and audio recordings (base64-encoded).
+
+### Import (restore from backup)
+
+1. Download your backup JSON from Google Drive to your device.
+2. Open the app → **Settings** tab.
+3. Tap **⬆️ Import Data** and select the JSON file.
+4. Confirm the overwrite warning — **all existing data will be replaced**.
+
+---
+
+## Stack
+
+| Layer | Library |
+|---|---|
+| Framework | React 19 + TypeScript |
+| Bundler | Vite 7 |
+| PWA / SW | vite-plugin-pwa (Workbox) |
+| Database | Dexie (IndexedDB) |
+| Signatures | signature_pad |
+| PDF | pdf-lib |
+| Routing | react-router-dom (HashRouter) |
+
+---
+
+## Security Note
+
+PIN is stored as a base64-encoded hash in `localStorage` (adequate for a single-admin MVP local app). For a production multi-user deployment, replace with a proper crypto hash (e.g. Web Crypto `SubtleCrypto.digest`).
+
+---
+
+## License
+
+MIT

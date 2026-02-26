@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Member } from '../db/db';
-import { useLangContext } from '../components/Layout';
+import { useLangContext } from '../context/LangContext';
 
 const emptyMember = (): Omit<Member, 'id' | 'createdAt'> => ({
   name: '',
