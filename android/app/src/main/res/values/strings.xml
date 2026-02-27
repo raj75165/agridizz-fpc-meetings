@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Agridizz FPC Meetings</string>
+    <string name="title_activity_main">Agridizz FPC Meetings</string>
+    <string name="package_name">com.agridizz.fpcmeetings</string>
+    <string name="custom_url_scheme">com.agridizz.fpcmeetings</string>
+</resources>
