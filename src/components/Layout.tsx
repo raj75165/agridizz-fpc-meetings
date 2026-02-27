@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { useLangContext } from '../context/LangContext';
 
 interface LayoutProps {
@@ -7,6 +8,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { currentLang, toggleLang, t } = useLangContext();
+
+  const navClass = ({ isActive }: { isActive: boolean }) =>
+    `nav-item${isActive ? ' active' : ''}`;
 
   return (
     <div className="app-container">
@@ -18,18 +22,18 @@ export default function Layout({ children }: LayoutProps) {
       </header>
       <main className="main-content">{children}</main>
       <nav className="bottom-nav">
-        <a href="#/members" className="nav-item">
+        <NavLink to="/members" className={navClass}>
           <span className="nav-icon">👥</span>
           <span>{t('members')}</span>
-        </a>
-        <a href="#/meetings" className="nav-item">
+        </NavLink>
+        <NavLink to="/meetings" className={navClass}>
           <span className="nav-icon">📋</span>
           <span>{t('meetings')}</span>
-        </a>
-        <a href="#/settings" className="nav-item">
+        </NavLink>
+        <NavLink to="/settings" className={navClass}>
           <span className="nav-icon">⚙️</span>
           <span>{t('settings')}</span>
-        </a>
+        </NavLink>
       </nav>
     </div>
   );

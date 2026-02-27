@@ -331,6 +331,7 @@ textarea.form-input { resize: vertical; min-height: 70px; }
 
 /* Audio */
 .audio-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.recording-indicator { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: var(--red); }
 .audio-info { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 13px; color: var(--text-muted); }
 .duration { font-weight: 600; }
 .audio-player { width: 100%; }
@@ -362,6 +363,7 @@ textarea.form-input { resize: vertical; min-height: 70px; }
 
 /* Signature canvas */
 .signature-canvas { touch-action: none; display: block; }
+.signature-pad-wrapper { display: flex; flex-direction: column; gap: 8px; }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar { width: 4px; }
