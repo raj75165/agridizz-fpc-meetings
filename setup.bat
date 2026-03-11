@@ -2,7 +2,7 @@
 setlocal
 
 REM ============================================================
-REM  Agridizz FPC Meetings — Windows Setup
+REM  FPO ACCOUNTING SOFTWARE — Windows Setup
 REM  Opens the app in the default browser.
 REM ============================================================
 
@@ -18,6 +18,6 @@ if not exist "%INDEX%" (
     exit /b 1
 )
 
-echo Opening Agridizz FPC Meetings...
+echo Opening FPO ACCOUNTING SOFTWARE...
 start "" "%INDEX%"
 exit /b 0

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-#  Agridizz FPC Meetings — Mac/Linux Setup
+#  FPO ACCOUNTING SOFTWARE — Mac/Linux Setup
 #  Opens index.html in the default browser.
 # ============================================================
 
@@ -20,7 +20,7 @@ if [ ! -x "$0" ]; then
   chmod +x "$0"
 fi
 
-echo "Opening Agridizz FPC Meetings..."
+echo "Opening FPO ACCOUNTING SOFTWARE..."
 
 if command -v xdg-open &>/dev/null; then
   # Linux
