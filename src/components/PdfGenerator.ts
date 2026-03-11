@@ -75,7 +75,7 @@ export async function generateMeetingPdf(
   };
 
   // Header
-  drawText('AGRIDIZZ FPC', margin, y, { size: 20, bold: true, color: green });
+  drawText('FPO ACCOUNTING SOFTWARE', margin, y, { size: 20, bold: true, color: green });
   y -= 25;
   drawText('Meeting Minutes', margin, y, { size: 14, bold: true, color: green });
   y -= 10;

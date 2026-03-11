@@ -1,4 +1,4 @@
-# Agridizz FPO Accounting Software
+# FPO ACCOUNTING SOFTWARE
 
 A web-based accounting and management solution for Farmer Producer Organizations (FPO/FPC).
 

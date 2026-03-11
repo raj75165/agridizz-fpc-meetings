@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.agridizz.fpcmeetings',
-  appName: 'Agridizz FPC Meetings',
+  appName: 'FPO ACCOUNTING SOFTWARE',
   webDir: 'dist',
 };
 

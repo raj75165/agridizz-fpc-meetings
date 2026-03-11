@@ -15,7 +15,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="app-container">
       <header className="top-nav">
-        <span className="app-title">🌾 Agridizz FPC</span>
+        <span className="app-title">🌾 FPO ACCOUNTING SOFTWARE</span>
         <button className="lang-btn" onClick={toggleLang}>
           {currentLang === 'hi' ? 'EN' : 'हि'}
         </button>

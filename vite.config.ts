@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
-        name: 'Agridizz FPC Meetings',
-        short_name: 'FPC Meetings',
-        description: 'Manage FPC meeting resolutions offline',
+        name: 'FPO ACCOUNTING SOFTWARE',
+        short_name: 'FPO Accounting',
+        description: 'Web-based accounting software for Farmer Producer Organizations',
         theme_color: '#1a6b3a',
         background_color: '#ffffff',
         display: 'standalone',

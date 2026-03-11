@@ -1,5 +1,5 @@
 @echo off
-:: Agridizz FPO Accounting — Windows Launcher
+:: FPO ACCOUNTING SOFTWARE — Windows Launcher
 :: Double-click this file to open the app in your default browser.
 
 set "DIR=%~dp0"
@@ -12,5 +12,5 @@ if not exist "%FILE%" (
     exit /b 1
 )
 
-echo Opening Agridizz FPO Accounting...
+echo Opening FPO ACCOUNTING SOFTWARE...
 start "" "%FILE%"

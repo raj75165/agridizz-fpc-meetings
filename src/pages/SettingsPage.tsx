@@ -144,7 +144,7 @@ export default function SettingsPage() {
       {/* App Info */}
       <div className="card">
         <h3>{t('appVersion')}</h3>
-        <p>Agridizz FPC Meetings v{APP_VERSION}</p>
+        <p>FPO ACCOUNTING SOFTWARE v{APP_VERSION}</p>
         <p className="text-muted">Offline-first PWA • All data stored locally</p>
       </div>
     </div>

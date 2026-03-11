@@ -183,7 +183,7 @@ const Income = {
 /* ===== FPO INFO ===== */
 const FpoInfo = {
   defaults: {
-    name: 'Agridizz FPC',
+    name: 'FPO ACCOUNTING SOFTWARE',
     regNo: '',
     address: '',
     phone: '',
