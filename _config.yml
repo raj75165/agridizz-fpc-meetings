@@ -1,0 +1,6 @@
+# GitHub Pages configuration for Agridizz FPO Accounting
+# This file enables GitHub Pages to serve index.html directly.
+# Enable GitHub Pages in the repository Settings → Pages → Source: main branch / root.
+
+title: Agridizz FPO Accounting
+description: Web-based accounting software for Farmer Producer Organizations
