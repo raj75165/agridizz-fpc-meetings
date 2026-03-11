@@ -6,16 +6,47 @@ A web-based accounting and management solution for Farmer Producer Organizations
 
 ## ▶️ How to Open
 
-### Option 1 — Download and open directly (easiest, no installation needed)
+### 🖥️ Opening on a Windows Machine
+
+**Yes — it works perfectly on Windows!** No installation, no administrator rights needed.
+
+#### Method A: One-click launcher (easiest)
+
+1. Click the green **Code** button at the top of this GitHub page.
+2. Choose **Download ZIP** and save the file somewhere (e.g., `Downloads`).
+3. Right-click the ZIP → **Extract All…** → choose a destination → click **Extract**.
+4. Open the extracted folder.
+5. **Double-click `open.bat`** — the app opens in your default browser immediately.
+
+> 💡 `open.bat` is a small Windows launcher included in this repo.  
+> It automatically finds `index.html` and opens it in your browser.
+
+#### Method B: Open `index.html` directly
+
+1. Download and extract the ZIP as described above (steps 1–4).
+2. Inside the extracted folder, **double-click `index.html`**.
+3. The app opens in your default web browser (Edge, Chrome, Firefox, etc.).
+
+#### Method C: Drag-and-drop into browser
+
+1. Download and extract the ZIP as described above.
+2. Open your browser (e.g., Microsoft Edge or Chrome).
+3. **Drag `index.html` from File Explorer** and drop it into the browser window.
+4. The app loads immediately.
+
+> ✅ No internet connection is needed after the files are downloaded.  
+> ✅ No installation, no server, no administrator rights required.  
+> ✅ Works on Windows 7, 8, 10, and 11.
+
+---
+
+### Option 1 — Download and open directly (all operating systems)
 
 1. Click the green **Code** button at the top of this GitHub page.
 2. Choose **Download ZIP** and save the file to your computer.
 3. **Extract / Unzip** the downloaded file (right-click → *Extract All* on Windows; double-click on Mac).
-4. Open the extracted folder and **double-click `index.html`**.
+4. Open the extracted folder and **double-click `index.html`** (or `open.bat` on Windows).
 5. The application opens instantly in your default web browser (Chrome, Firefox, Edge, etc.).
-
-> ✅ No internet connection is needed after the files are downloaded.  
-> ✅ No installation, no setup, no server required.
 
 ---
 
@@ -38,10 +69,11 @@ git clone https://github.com/raj75165/agridizz-fpc-meetings.git
 cd agridizz-fpc-meetings
 ```
 
-Then open `index.html` in your browser:
+Then open the app:
 
-- **Windows**: Double-click `index.html`, or drag it into your browser window.
-- **Mac / Linux**: Run `open index.html` (Mac) or `xdg-open index.html` (Linux) in the terminal.
+- **Windows**: Double-click `open.bat`, or double-click `index.html`, or drag it into your browser.
+- **Mac**: Run `open index.html` in the terminal, or double-click `index.html` in Finder.
+- **Linux**: Run `xdg-open index.html` in the terminal.
 
 ---
 
@@ -64,6 +96,7 @@ Then open `index.html` in your browser:
 
 ```
 ├── index.html          # Main application — open this file to start
+├── open.bat            # Windows launcher — double-click to open in browser
 ├── css/
 │   └── style.css       # Stylesheet
 └── js/
