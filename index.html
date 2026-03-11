@@ -8,57 +8,83 @@
 </head>
 <body>
   <!-- Sidebar / Nav -->
-  <nav id="sidebar">
+  <nav id="sidebar" aria-label="Main navigation">
     <div class="sidebar-header">
-      <span class="logo">🌾 FPC Meetings</span>
-      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+      <div class="sidebar-brand">
+        <span class="brand-icon">🌾</span>
+        <span class="brand-name">FPC Meetings</span>
+      </div>
+      <button id="menuToggle" class="menu-toggle" aria-label="Close menu">✕</button>
     </div>
-    <ul class="nav-list">
-      <li><a href="#" class="nav-link active" data-page="dashboard">📊 Dashboard</a></li>
-      <li><a href="#" class="nav-link" data-page="meetings">📅 Meetings</a></li>
-      <li><a href="#" class="nav-link" data-page="members">👥 Members</a></li>
-      <li><a href="#" class="nav-link" data-page="settings">⚙️ Settings</a></li>
+
+    <div class="sidebar-org" id="sidebarOrgName">Agridizz FPC</div>
+
+    <ul class="nav-list" role="list">
+      <li><a href="#" class="nav-link active" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a></li>
+      <li><a href="#" class="nav-link" data-page="meetings"><span class="nav-icon">📅</span><span class="nav-text">Meetings</span></a></li>
+      <li><a href="#" class="nav-link" data-page="members"><span class="nav-icon">👥</span><span class="nav-text">Members</span></a></li>
+      <li><a href="#" class="nav-link" data-page="account"><span class="nav-icon">👤</span><span class="nav-text">Account</span></a></li>
+      <li><a href="#" class="nav-link" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-text">Settings</span></a></li>
     </ul>
+
     <div class="sidebar-footer">
-      <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
+      <div class="sidebar-user" id="sidebarUserInfo">
+        <span class="user-avatar">👤</span>
+        <div class="user-details">
+          <span class="user-name" id="sidebarUserName">Admin</span>
+          <span class="user-role" id="sidebarUserRole">Administrator</span>
+        </div>
+      </div>
     </div>
   </nav>
 
   <!-- Overlay for mobile -->
-  <div id="overlay" class="overlay"></div>
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- Top Bar (mobile header) -->
+  <header id="topbar">
+    <button id="topbarMenuBtn" class="topbar-menu-btn" aria-label="Open menu">☰</button>
+    <span class="topbar-title">🌾 FPC Meetings</span>
+    <button class="topbar-account-btn" onclick="showPage('account')" aria-label="Account">👤</button>
+  </header>
 
   <!-- Main Content -->
   <main id="main">
 
     <!-- Dashboard Page -->
     <section id="page-dashboard" class="page active">
-      <div class="page-header">
-        <h1>Dashboard</h1>
+      <div class="dashboard-welcome" id="dashboardWelcome">
+        <div class="welcome-text">
+          <h1 id="welcomeHeading">Good morning! 👋</h1>
+          <p id="welcomeSubtext">Here's what's happening with your FPC today.</p>
+        </div>
+        <button class="btn btn-primary btn-new-meeting" onclick="openMeetingModal()">+ New Meeting</button>
       </div>
+
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
+        <div class="stat-card stat-blue">
+          <div class="stat-icon-wrap">📅</div>
           <div class="stat-info">
             <span class="stat-value" id="statTotalMeetings">0</span>
             <span class="stat-label">Total Meetings</span>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon">✅</div>
-          <div class="stat-info">
-            <span class="stat-value" id="statCompletedMeetings">0</span>
-            <span class="stat-label">Completed</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🔜</div>
+        <div class="stat-card stat-orange">
+          <div class="stat-icon-wrap">🔜</div>
           <div class="stat-info">
             <span class="stat-value" id="statUpcomingMeetings">0</span>
             <span class="stat-label">Upcoming</span>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
+        <div class="stat-card stat-green">
+          <div class="stat-icon-wrap">✅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statCompletedMeetings">0</span>
+            <span class="stat-label">Completed</span>
+          </div>
+        </div>
+        <div class="stat-card stat-purple">
+          <div class="stat-icon-wrap">👥</div>
           <div class="stat-info">
             <span class="stat-value" id="statTotalMembers">0</span>
             <span class="stat-label">Members</span>
@@ -66,10 +92,24 @@
         </div>
       </div>
 
-      <div class="section-card">
-        <h2>Recent Meetings</h2>
-        <div id="recentMeetingsList" class="item-list">
-          <p class="empty-msg">No meetings yet. <a href="#" data-page="meetings">Create one →</a></p>
+      <div class="dashboard-grid">
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2>Upcoming Meetings</h2>
+            <a href="#" class="link-sm" data-page="meetings">View all →</a>
+          </div>
+          <div id="upcomingMeetingsList" class="item-list">
+            <p class="empty-msg">No upcoming meetings. <a href="#" data-page="meetings">Schedule one →</a></p>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-card-header">
+            <h2>Recent Activity</h2>
+          </div>
+          <div id="recentMeetingsList" class="item-list">
+            <p class="empty-msg">No meetings yet. <a href="#" data-page="meetings">Create one →</a></p>
+          </div>
         </div>
       </div>
     </section>
@@ -111,6 +151,45 @@
       </div>
     </section>
 
+    <!-- Account Page -->
+    <section id="page-account" class="page">
+      <div class="page-header">
+        <h1>Account</h1>
+        <button class="btn btn-primary" onclick="openAccountModal()">✏️ Edit Profile</button>
+      </div>
+
+      <div class="account-profile-card">
+        <div class="account-avatar" id="accountAvatar">🏢</div>
+        <div class="account-profile-info">
+          <h2 id="accountOrgName">Agridizz FPC</h2>
+          <p id="accountAdminName" class="account-admin"></p>
+          <p id="accountRegNo" class="account-meta"></p>
+        </div>
+      </div>
+
+      <div class="account-details-grid">
+        <div class="section-card">
+          <h2>Organisation Details</h2>
+          <dl class="detail-list" id="accountOrgDetails">
+            <dt>FPC Name</dt><dd id="detOrgName">—</dd>
+            <dt>Registration No.</dt><dd id="detRegNo">—</dd>
+            <dt>Address</dt><dd id="detAddress">—</dd>
+            <dt>District / State</dt><dd id="detDistrict">—</dd>
+          </dl>
+        </div>
+
+        <div class="section-card">
+          <h2>Administrator Details</h2>
+          <dl class="detail-list" id="accountAdminDetails">
+            <dt>Full Name</dt><dd id="detAdminName">—</dd>
+            <dt>Designation</dt><dd id="detDesignation">—</dd>
+            <dt>Phone</dt><dd id="detPhone">—</dd>
+            <dt>Email</dt><dd id="detEmail">—</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
     <!-- Settings Page -->
     <section id="page-settings" class="page">
       <div class="page-header">
@@ -131,18 +210,8 @@
       </div>
 
       <div class="section-card">
-        <h2>Setup Files</h2>
-        <p class="muted">Download the setup file for your operating system to easily open this app.</p>
-        <div class="btn-group">
-          <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
-          <button class="btn btn-secondary" onclick="downloadSetupFile('bat')">⬇ Download for Windows (.bat)</button>
-          <button class="btn btn-secondary" onclick="downloadSetupFile('sh')">⬇ Download for Mac/Linux (.sh)</button>
-        </div>
-      </div>
-
-      <div class="section-card">
         <h2>About</h2>
-        <p class="muted">Agridizz FPC Meetings — v1.0.0</p>
+        <p class="muted">Agridizz FPC Meetings — v1.1.0</p>
         <p class="muted">Offline-first meeting management for Farmer Producer Companies.</p>
       </div>
     </section>
@@ -162,13 +231,15 @@
           <label for="meetingTitle">Title <span class="required">*</span></label>
           <input type="text" id="meetingTitle" required placeholder="e.g. Monthly Board Meeting" />
         </div>
-        <div class="form-group">
-          <label for="meetingDate">Date <span class="required">*</span></label>
-          <input type="date" id="meetingDate" required />
-        </div>
-        <div class="form-group">
-          <label for="meetingTime">Time</label>
-          <input type="time" id="meetingTime" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="meetingDate">Date <span class="required">*</span></label>
+            <input type="date" id="meetingDate" required />
+          </div>
+          <div class="form-group">
+            <label for="meetingTime">Time</label>
+            <input type="time" id="meetingTime" />
+          </div>
         </div>
         <div class="form-group">
           <label for="meetingLocation">Location</label>
@@ -211,25 +282,84 @@
           <label for="memberName">Full Name <span class="required">*</span></label>
           <input type="text" id="memberName" required placeholder="e.g. Ramesh Kumar" />
         </div>
-        <div class="form-group">
-          <label for="memberPhone">Phone</label>
-          <input type="tel" id="memberPhone" placeholder="e.g. 9876543210" autocomplete="tel" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="memberPhone">Phone</label>
+            <input type="tel" id="memberPhone" placeholder="e.g. 9876543210" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="memberEmail">Email</label>
+            <input type="email" id="memberEmail" placeholder="e.g. ramesh@example.com" autocomplete="email" />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="memberEmail">Email</label>
-          <input type="email" id="memberEmail" placeholder="e.g. ramesh@example.com" autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label for="memberRole">Role</label>
-          <input type="text" id="memberRole" placeholder="e.g. Director, Treasurer" />
-        </div>
-        <div class="form-group">
-          <label for="memberVillage">Village / Location</label>
-          <input type="text" id="memberVillage" placeholder="e.g. Nashik" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="memberRole">Role</label>
+            <input type="text" id="memberRole" placeholder="e.g. Director, Treasurer" />
+          </div>
+          <div class="form-group">
+            <label for="memberVillage">Village / Location</label>
+            <input type="text" id="memberVillage" placeholder="e.g. Nashik" />
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div id="accountModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="accountModalTitle">Edit Profile</h2>
+        <button class="modal-close" onclick="closeModal('accountModal')" aria-label="Close">✕</button>
+      </div>
+      <form id="accountForm" onsubmit="saveAccount(event)">
+        <div class="form-section-label">Organisation Details</div>
+        <div class="form-group">
+          <label for="accOrgName">FPC / Organisation Name <span class="required">*</span></label>
+          <input type="text" id="accOrgName" required placeholder="e.g. Agridizz Farmer Producer Company" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="accRegNo">Registration No.</label>
+            <input type="text" id="accRegNo" placeholder="e.g. FPC/2020/1234" />
+          </div>
+          <div class="form-group">
+            <label for="accDistrict">District / State</label>
+            <input type="text" id="accDistrict" placeholder="e.g. Nashik, Maharashtra" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="accAddress">Address</label>
+          <textarea id="accAddress" rows="2" placeholder="e.g. Village Road, Taluka, District"></textarea>
+        </div>
+
+        <div class="form-section-label">Administrator Details</div>
+        <div class="form-group">
+          <label for="accAdminName">Full Name <span class="required">*</span></label>
+          <input type="text" id="accAdminName" required placeholder="e.g. Ramesh Kumar" />
+        </div>
+        <div class="form-group">
+          <label for="accDesignation">Designation</label>
+          <input type="text" id="accDesignation" placeholder="e.g. CEO, Chairman, Secretary" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="accPhone">Phone</label>
+            <input type="tel" id="accPhone" placeholder="e.g. 9876543210" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="accEmail">Email</label>
+            <input type="email" id="accEmail" placeholder="e.g. admin@fpc.org" autocomplete="email" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('accountModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Profile</button>
         </div>
       </form>
     </div>
