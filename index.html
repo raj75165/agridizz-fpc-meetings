@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agridizz FPC Meetings</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Sidebar / Nav -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">🌾 FPC Meetings</span>
+      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+    <ul class="nav-list">
+      <li><a href="#" class="nav-link active" data-page="dashboard">📊 Dashboard</a></li>
+      <li><a href="#" class="nav-link" data-page="meetings">📅 Meetings</a></li>
+      <li><a href="#" class="nav-link" data-page="members">👥 Members</a></li>
+      <li><a href="#" class="nav-link" data-page="settings">⚙️ Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
+    </div>
+  </nav>
+
+  <!-- Overlay for mobile -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Main Content -->
+  <main id="main">
+
+    <!-- Dashboard Page -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTotalMeetings">0</span>
+            <span class="stat-label">Total Meetings</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statCompletedMeetings">0</span>
+            <span class="stat-label">Completed</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔜</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statUpcomingMeetings">0</span>
+            <span class="stat-label">Upcoming</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTotalMembers">0</span>
+            <span class="stat-label">Members</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2>Recent Meetings</h2>
+        <div id="recentMeetingsList" class="item-list">
+          <p class="empty-msg">No meetings yet. <a href="#" data-page="meetings">Create one →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meetings Page -->
+    <section id="page-meetings" class="page">
+      <div class="page-header">
+        <h1>Meetings</h1>
+        <button class="btn btn-primary" onclick="openMeetingModal()">+ New Meeting</button>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="meetingSearch" placeholder="Search meetings…" oninput="renderMeetings()" />
+        <select id="meetingFilter" onchange="renderMeetings()">
+          <option value="all">All</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      <div id="meetingsList" class="item-list">
+        <p class="empty-msg">No meetings found.</p>
+      </div>
+    </section>
+
+    <!-- Members Page -->
+    <section id="page-members" class="page">
+      <div class="page-header">
+        <h1>Members</h1>
+        <button class="btn btn-primary" onclick="openMemberModal()">+ Add Member</button>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="memberSearch" placeholder="Search members…" oninput="renderMembers()" />
+      </div>
+
+      <div id="membersList" class="item-list">
+        <p class="empty-msg">No members found.</p>
+      </div>
+    </section>
+
+    <!-- Settings Page -->
+    <section id="page-settings" class="page">
+      <div class="page-header">
+        <h1>Settings</h1>
+      </div>
+
+      <div class="section-card">
+        <h2>Data Management</h2>
+        <p class="muted">Export or import your meetings and members data as JSON.</p>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="exportData()">📤 Export Data</button>
+          <label class="btn btn-secondary btn-file-label">
+            📥 Import Data
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none" />
+          </label>
+        </div>
+        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+      </div>
+
+      <div class="section-card">
+        <h2>Setup Files</h2>
+        <p class="muted">Download the setup file for your operating system to easily open this app.</p>
+        <div class="btn-group">
+          <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
+          <button class="btn btn-secondary" onclick="downloadSetupFile('bat')">⬇ Download for Windows (.bat)</button>
+          <button class="btn btn-secondary" onclick="downloadSetupFile('sh')">⬇ Download for Mac/Linux (.sh)</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2>About</h2>
+        <p class="muted">Agridizz FPC Meetings — v1.0.0</p>
+        <p class="muted">Offline-first meeting management for Farmer Producer Companies.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Meeting Modal -->
+  <div id="meetingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="meetingModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="meetingModalTitle">New Meeting</h2>
+        <button class="modal-close" onclick="closeModal('meetingModal')" aria-label="Close">✕</button>
+      </div>
+      <form id="meetingForm" onsubmit="saveMeeting(event)">
+        <input type="hidden" id="meetingId" />
+        <div class="form-group">
+          <label for="meetingTitle">Title <span class="required">*</span></label>
+          <input type="text" id="meetingTitle" required placeholder="e.g. Monthly Board Meeting" />
+        </div>
+        <div class="form-group">
+          <label for="meetingDate">Date <span class="required">*</span></label>
+          <input type="date" id="meetingDate" required />
+        </div>
+        <div class="form-group">
+          <label for="meetingTime">Time</label>
+          <input type="time" id="meetingTime" />
+        </div>
+        <div class="form-group">
+          <label for="meetingLocation">Location</label>
+          <input type="text" id="meetingLocation" placeholder="e.g. Village Hall, Room 2" />
+        </div>
+        <div class="form-group">
+          <label for="meetingAgenda">Agenda</label>
+          <textarea id="meetingAgenda" rows="3" placeholder="Meeting agenda or notes…"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="meetingStatus">Status</label>
+          <select id="meetingStatus">
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="meetingAttendees">Attendees</label>
+          <div id="attendeeCheckboxes" class="checkbox-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('meetingModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Meeting</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Member Modal -->
+  <div id="memberModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="memberModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="memberModalTitle">Add Member</h2>
+        <button class="modal-close" onclick="closeModal('memberModal')" aria-label="Close">✕</button>
+      </div>
+      <form id="memberForm" onsubmit="saveMember(event)">
+        <input type="hidden" id="memberId" />
+        <div class="form-group">
+          <label for="memberName">Full Name <span class="required">*</span></label>
+          <input type="text" id="memberName" required placeholder="e.g. Ramesh Kumar" />
+        </div>
+        <div class="form-group">
+          <label for="memberPhone">Phone</label>
+          <input type="tel" id="memberPhone" placeholder="e.g. 9876543210" autocomplete="tel" />
+        </div>
+        <div class="form-group">
+          <label for="memberEmail">Email</label>
+          <input type="email" id="memberEmail" placeholder="e.g. ramesh@example.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="memberRole">Role</label>
+          <input type="text" id="memberRole" placeholder="e.g. Director, Treasurer" />
+        </div>
+        <div class="form-group">
+          <label for="memberVillage">Village / Location</label>
+          <input type="text" id="memberVillage" placeholder="e.g. Nashik" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div id="confirmModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h2 id="confirmTitle">Confirm</h2>
+        <button class="modal-close" onclick="closeModal('confirmModal')" aria-label="Close">✕</button>
+      </div>
+      <p id="confirmMessage" class="confirm-msg"></p>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
