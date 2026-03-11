@@ -9,7 +9,7 @@
 // Storage Helpers
 // ============================================================
 
-const KEYS = { meetings: 'fpc_meetings', members: 'fpc_members' };
+const KEYS = { meetings: 'fpc_meetings', members: 'fpc_members', account: 'fpc_account' };
 
 function loadData(key) {
   try {
@@ -27,6 +27,15 @@ function getMeetings() { return loadData(KEYS.meetings); }
 function getMembers()  { return loadData(KEYS.members); }
 function saveMeetings(d) { saveData(KEYS.meetings, d); }
 function saveMembers(d)  { saveData(KEYS.members, d); }
+
+function getAccount() {
+  try {
+    return JSON.parse(localStorage.getItem(KEYS.account)) || {};
+  } catch (_) {
+    return {};
+  }
+}
+function saveAccountData(d) { saveData(KEYS.account, d); }
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -113,6 +122,7 @@ function showPage(pageId) {
   if (pageId === 'dashboard') renderDashboard();
   if (pageId === 'meetings')  renderMeetings();
   if (pageId === 'members')   renderMembers();
+  if (pageId === 'account')   renderAccount();
 
   // Close sidebar on mobile after navigation
   if (window.innerWidth < 768) closeSidebar();
@@ -152,33 +162,69 @@ document.getElementById('menuToggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
 });
 
+const topbarMenuBtn = document.getElementById('topbarMenuBtn');
+if (topbarMenuBtn) {
+  topbarMenuBtn.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+}
+
 document.getElementById('overlay').addEventListener('click', closeSidebar);
 
 // ============================================================
 // Dashboard
 // ============================================================
 
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning! 👋';
+  if (h < 17) return 'Good afternoon! 👋';
+  return 'Good evening! 👋';
+}
+
 function renderDashboard() {
   const meetings = getMeetings();
   const members  = getMembers();
+  const account  = getAccount();
   const today    = new Date().toISOString().slice(0, 10);
 
   const total     = meetings.length;
   const completed = meetings.filter(m => m.status === 'completed').length;
   const upcoming  = meetings.filter(m => m.status === 'upcoming' && m.date >= today).length;
 
-  document.getElementById('statTotalMeetings').textContent    = total;
+  document.getElementById('statTotalMeetings').textContent     = total;
   document.getElementById('statCompletedMeetings').textContent = completed;
   document.getElementById('statUpcomingMeetings').textContent  = upcoming;
   document.getElementById('statTotalMembers').textContent      = members.length;
 
-  const recentList = document.getElementById('recentMeetingsList');
-  const sorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  // Welcome banner
+  const heading = document.getElementById('welcomeHeading');
+  const subtext = document.getElementById('welcomeSubtext');
+  if (heading) heading.textContent = getGreeting();
+  if (subtext) {
+    const orgName = account.orgName || 'your FPC';
+    subtext.textContent = `Here's what's happening with ${orgName} today.`;
+  }
 
-  if (sorted.length === 0) {
+  // Upcoming meetings (next 5)
+  const upcomingList = document.getElementById('upcomingMeetingsList');
+  const upcomingSorted = meetings
+    .filter(m => m.status === 'upcoming' && m.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, 5);
+  if (upcomingSorted.length === 0) {
+    upcomingList.innerHTML = '<p class="empty-msg">No upcoming meetings. <a href="#" data-page="meetings">Schedule one →</a></p>';
+  } else {
+    upcomingList.innerHTML = upcomingSorted.map(m => meetingCardHTML(m)).join('');
+  }
+
+  // Recent activity (last 5)
+  const recentList = document.getElementById('recentMeetingsList');
+  const recentSorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  if (recentSorted.length === 0) {
     recentList.innerHTML = '<p class="empty-msg">No meetings yet. <a href="#" data-page="meetings">Create one →</a></p>';
   } else {
-    recentList.innerHTML = sorted.map(m => meetingCardHTML(m)).join('');
+    recentList.innerHTML = recentSorted.map(m => meetingCardHTML(m)).join('');
   }
 }
 
@@ -484,101 +530,82 @@ function clearAllData() {
 }
 
 // ============================================================
-// Download Setup File
+// Account Management
 // ============================================================
 
-/**
- * Detects the user's OS and downloads the appropriate setup file.
- * Pass 'bat' or 'sh' to force a specific variant.
- * @param {string|null} forceType - 'bat' | 'sh' | null (auto-detect)
- */
-function downloadSetupFile(forceType = null) {
-  const platform = (navigator.userAgentData?.platform || navigator.platform || '').toLowerCase();
-  const ua = navigator.userAgent.toLowerCase();
-  // Explicitly detect Windows, defaulting to Unix for any other platform
-  const isWindows = forceType === 'bat'
-    || (!forceType && (platform.includes('win') || ua.includes('windows'))
-        && !platform.includes('mac') && !ua.includes('mac') && !ua.includes('darwin'));
+function renderAccount() {
+  const account = getAccount();
 
-  if (isWindows) {
-    downloadWindowsSetup();
-  } else {
-    downloadUnixSetup();
-  }
+  const orgName   = account.orgName   || 'Agridizz FPC';
+  const adminName = account.adminName || '';
+  const regNo     = account.regNo     || '';
+
+  // Profile card
+  const orgNameEl = document.getElementById('accountOrgName');
+  if (orgNameEl) orgNameEl.textContent = orgName;
+
+  const adminNameEl = document.getElementById('accountAdminName');
+  if (adminNameEl) adminNameEl.textContent = adminName ? `👤 ${adminName}` : '';
+
+  const regNoEl = document.getElementById('accountRegNo');
+  if (regNoEl) regNoEl.textContent = regNo ? `Reg. No: ${regNo}` : '';
+
+  // Detail fields
+  setText('detOrgName',     orgName);
+  setText('detRegNo',       account.regNo       || '—');
+  setText('detAddress',     account.address     || '—');
+  setText('detDistrict',    account.district    || '—');
+  setText('detAdminName',   account.adminName   || '—');
+  setText('detDesignation', account.designation || '—');
+  setText('detPhone',       account.phone       || '—');
+  setText('detEmail',       account.email       || '—');
 }
 
-function downloadWindowsSetup() {
-  const content = [
-    '@echo off',
-    'setlocal',
-    '',
-    'REM ============================================================',
-    'REM  Agridizz FPC Meetings — Windows Setup',
-    'REM  Opens the app in the default browser.',
-    'REM ============================================================',
-    '',
-    'set "SCRIPT_DIR=%~dp0"',
-    'set "INDEX=%SCRIPT_DIR%index.html"',
-    '',
-    'if not exist "%INDEX%" (',
-    '    echo.',
-    '    echo  ERROR: index.html not found in %SCRIPT_DIR%',
-    '    echo  Please make sure setup.bat and index.html are in the same folder.',
-    '    echo.',
-    '    pause',
-    '    exit /b 1',
-    ')',
-    '',
-    'echo Opening Agridizz FPC Meetings...',
-    'start "" "%INDEX%"',
-    'exit /b 0',
-  ].join('\r\n');
-
-  const blob = new Blob([content], { type: 'text/plain' });
-  triggerDownload(blob, 'setup.bat');
-  showToast('setup.bat downloaded. Double-click it to open the app.');
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
 }
 
-function downloadUnixSetup() {
-  const content = [
-    '#!/usr/bin/env bash',
-    '# ============================================================',
-    '#  Agridizz FPC Meetings — Mac/Linux Setup',
-    '#  Opens index.html in the default browser.',
-    '# ============================================================',
-    '',
-    'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
-    'INDEX="$SCRIPT_DIR/index.html"',
-    '',
-    'if [ ! -f "$INDEX" ]; then',
-    '  echo ""',
-    '  echo "  ERROR: index.html not found in $SCRIPT_DIR"',
-    '  echo "  Please make sure setup.sh and index.html are in the same folder."',
-    '  echo ""',
-    '  exit 1',
-    'fi',
-    '',
-    'echo "Opening Agridizz FPC Meetings..."',
-    '',
-    'if command -v xdg-open &>/dev/null; then',
-    '  # Linux',
-    '  xdg-open "$INDEX"',
-    'elif command -v open &>/dev/null; then',
-    '  # macOS',
-    '  open "$INDEX"',
-    'else',
-    '  echo ""',
-    '  echo "  Could not detect a browser opener (xdg-open / open)."',
-    '  echo "  Please open the following file manually in your browser:"',
-    '  echo "  $INDEX"',
-    '  echo ""',
-    '  exit 1',
-    'fi',
-  ].join('\n');
+function updateSidebarAccountInfo(account) {
+  const orgEl  = document.getElementById('sidebarOrgName');
+  const nameEl = document.getElementById('sidebarUserName');
+  const roleEl = document.getElementById('sidebarUserRole');
 
-  const blob = new Blob([content], { type: 'text/plain' });
-  triggerDownload(blob, 'setup.sh');
-  showToast('setup.sh downloaded. Run: chmod +x setup.sh && ./setup.sh');
+  if (orgEl)  orgEl.textContent  = account.orgName   || 'Agridizz FPC';
+  if (nameEl) nameEl.textContent = account.adminName || 'Admin';
+  if (roleEl) roleEl.textContent = account.designation || 'Administrator';
+}
+
+function openAccountModal() {
+  const account = getAccount();
+  document.getElementById('accOrgName').value     = account.orgName     || '';
+  document.getElementById('accRegNo').value       = account.regNo       || '';
+  document.getElementById('accDistrict').value    = account.district    || '';
+  document.getElementById('accAddress').value     = account.address     || '';
+  document.getElementById('accAdminName').value   = account.adminName   || '';
+  document.getElementById('accDesignation').value = account.designation || '';
+  document.getElementById('accPhone').value       = account.phone       || '';
+  document.getElementById('accEmail').value       = account.email       || '';
+  openModal('accountModal');
+}
+
+function saveAccount(e) {
+  e.preventDefault();
+  const data = {
+    orgName:     document.getElementById('accOrgName').value.trim(),
+    regNo:       document.getElementById('accRegNo').value.trim(),
+    district:    document.getElementById('accDistrict').value.trim(),
+    address:     document.getElementById('accAddress').value.trim(),
+    adminName:   document.getElementById('accAdminName').value.trim(),
+    designation: document.getElementById('accDesignation').value.trim(),
+    phone:       document.getElementById('accPhone').value.trim(),
+    email:       document.getElementById('accEmail').value.trim(),
+    updatedAt:   new Date().toISOString(),
+  };
+  saveAccountData(data);
+  closeModal('accountModal');
+  renderAccount();
+  showToast('Profile saved successfully.');
 }
 
 // ============================================================
@@ -621,5 +648,6 @@ function dateSlug() {
 // ============================================================
 
 (function init() {
+  updateSidebarAccountInfo(getAccount());
   showPage('dashboard');
 })();
