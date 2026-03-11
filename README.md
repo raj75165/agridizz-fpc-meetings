@@ -92,6 +92,77 @@ Then open the app:
   - Member Statements (individual farmer procurement and payment summary)
 - **Settings** – Configure FPO details (name, registration number, financial year, address). Export/import data as JSON backup.
 
+## 📦 Where Is Data Stored?
+
+All data is stored **inside your web browser** using the browser's built-in **`localStorage`** mechanism.  
+There is **no server, no database file, and no cloud** — everything lives locally on your device.
+
+### What gets stored
+
+| localStorage key | Contents |
+|-----------------|----------|
+| `fpo_members` | Registered farmer members |
+| `fpo_procurement` | Commodity purchase records |
+| `fpo_sales` | Sales records |
+| `fpo_expenses` | Expense vouchers |
+| `fpo_income` | Other income entries |
+| `fpo_info` | FPO organisation settings |
+
+### Physical location on your device
+
+Browser localStorage is stored in a folder managed by your browser — you do not normally need to access it directly. The exact path is shown below for reference:
+
+#### 🖥️ Windows
+
+| Browser | Path |
+|---------|------|
+| **Google Chrome** | `%LOCALAPPDATA%\Google\Chrome\User Data\Default\Local Storage\leveldb\` |
+| **Microsoft Edge** | `%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Local Storage\leveldb\` |
+| **Mozilla Firefox** | `%APPDATA%\Mozilla\Firefox\Profiles\<profile>\storage\default\` |
+
+> 💡 Paste the path into the Windows File Explorer address bar (replace `<profile>` with your actual Firefox profile folder name).
+
+#### 🍎 Mac
+
+| Browser | Path |
+|---------|------|
+| **Google Chrome** | `~/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb/` |
+| **Safari** | `~/Library/Safari/LocalStorage/` |
+| **Firefox** | `~/Library/Application Support/Firefox/Profiles/<profile>/storage/default/` |
+
+#### 🐧 Linux
+
+| Browser | Path |
+|---------|------|
+| **Google Chrome** | `~/.config/google-chrome/Default/Local Storage/leveldb/` |
+| **Firefox** | `~/.mozilla/firefox/<profile>/storage/default/` |
+
+### ⚠️ Important — data loss warning
+
+> **Clearing your browser's cache/cookies/site data will permanently delete all app data.**  
+> Always export a backup before clearing browser data or switching to a different browser.
+
+### 🔄 Backup and restore your data
+
+The app includes a built-in export/import tool so you never lose your data.
+
+#### To back up (export)
+
+1. Open the app and go to **Settings** (gear icon in the sidebar).
+2. Click **Export Data**.
+3. A file named `fpo-accounting-backup-YYYY-MM-DD.json` is downloaded to your computer.
+4. Keep this file safe — it contains all your records.
+
+#### To restore (import)
+
+1. Open the app and go to **Settings**.
+2. Click **Import Data** and select a previously exported `.json` backup file.
+3. All records are restored and the app reloads automatically.
+
+> ✅ You can also use Export/Import to **move data between browsers or computers**.
+
+---
+
 ## File Structure
 
 ```
@@ -107,7 +178,7 @@ Then open the app:
 ## Usage Notes
 
 - Works entirely in the browser; no internet connection required after first load.
-- Data persists across browser sessions via localStorage (stored on your device).
+- Data is stored in the browser's **localStorage** on your device (see [Where Is Data Stored?](#-where-is-data-stored) above).
 - Use **Export Data** in Settings to create JSON backups and **Import Data** to restore them.
 - The **Print** button on the Reports page prints the currently displayed report.
 
