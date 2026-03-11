@@ -495,8 +495,10 @@ function clearAllData() {
 function downloadSetupFile(forceType = null) {
   const platform = (navigator.userAgentData?.platform || navigator.platform || '').toLowerCase();
   const ua = navigator.userAgent.toLowerCase();
+  // Explicitly detect Windows, defaulting to Unix for any other platform
   const isWindows = forceType === 'bat'
-    || (!forceType && platform.includes('win') && !ua.includes('mac'));
+    || (!forceType && (platform.includes('win') || ua.includes('windows'))
+        && !platform.includes('mac') && !ua.includes('mac') && !ua.includes('darwin'));
 
   if (isWindows) {
     downloadWindowsSetup();
@@ -510,15 +512,19 @@ function downloadWindowsSetup() {
     '@echo off',
     'setlocal',
     '',
-    'REM Agridizz FPC Meetings — Windows Setup',
-    'REM Opens the app in the default browser.',
+    'REM ============================================================',
+    'REM  Agridizz FPC Meetings — Windows Setup',
+    'REM  Opens the app in the default browser.',
+    'REM ============================================================',
     '',
     'set "SCRIPT_DIR=%~dp0"',
     'set "INDEX=%SCRIPT_DIR%index.html"',
     '',
     'if not exist "%INDEX%" (',
-    '    echo ERROR: index.html not found in %SCRIPT_DIR%',
-    '    echo Please make sure setup.bat and index.html are in the same folder.',
+    '    echo.',
+    '    echo  ERROR: index.html not found in %SCRIPT_DIR%',
+    '    echo  Please make sure setup.bat and index.html are in the same folder.',
+    '    echo.',
     '    pause',
     '    exit /b 1',
     ')',
@@ -530,44 +536,49 @@ function downloadWindowsSetup() {
 
   const blob = new Blob([content], { type: 'text/plain' });
   triggerDownload(blob, 'setup.bat');
-  showToast('setup.bat downloaded. Run it to open the app.');
+  showToast('setup.bat downloaded. Double-click it to open the app.');
 }
 
 function downloadUnixSetup() {
   const content = [
     '#!/usr/bin/env bash',
-    '# Agridizz FPC Meetings — Mac/Linux Setup',
-    '# Opens index.html in the default browser.',
+    '# ============================================================',
+    '#  Agridizz FPC Meetings — Mac/Linux Setup',
+    '#  Opens index.html in the default browser.',
+    '# ============================================================',
     '',
     'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
     'INDEX="$SCRIPT_DIR/index.html"',
     '',
     'if [ ! -f "$INDEX" ]; then',
-    '  echo "ERROR: index.html not found in $SCRIPT_DIR"',
-    '  echo "Please make sure setup.sh and index.html are in the same folder."',
+    '  echo ""',
+    '  echo "  ERROR: index.html not found in $SCRIPT_DIR"',
+    '  echo "  Please make sure setup.sh and index.html are in the same folder."',
+    '  echo ""',
     '  exit 1',
-    'fi',
-    '',
-    '# Make this script executable if it is not already (one-time, harmless guard)',
-    'if [ ! -x "$0" ]; then',
-    '  chmod +x "$0"',
     'fi',
     '',
     'echo "Opening Agridizz FPC Meetings..."',
     '',
     'if command -v xdg-open &>/dev/null; then',
+    '  # Linux',
     '  xdg-open "$INDEX"',
     'elif command -v open &>/dev/null; then',
+    '  # macOS',
     '  open "$INDEX"',
     'else',
-    '  echo "Could not detect a browser opener. Please open index.html manually."',
+    '  echo ""',
+    '  echo "  Could not detect a browser opener (xdg-open / open)."',
+    '  echo "  Please open the following file manually in your browser:"',
+    '  echo "  $INDEX"',
+    '  echo ""',
     '  exit 1',
     'fi',
   ].join('\n');
 
   const blob = new Blob([content], { type: 'text/plain' });
   triggerDownload(blob, 'setup.sh');
-  showToast('setup.sh downloaded. Run it to open the app.');
+  showToast('setup.sh downloaded. Run: chmod +x setup.sh && ./setup.sh');
 }
 
 // ============================================================
