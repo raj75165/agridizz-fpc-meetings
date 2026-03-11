@@ -709,6 +709,232 @@ function buildMemberStatement() {
   }).join('');
 }
 
+/* ===== REPORT SHARING ===== */
+
+/** Escape a value for inclusion in a CSV cell */
+function csvCell(val) {
+  const s = String(val === undefined || val === null ? '' : val);
+  return (s.includes(',') || s.includes('"') || s.includes('\n'))
+    ? '"' + s.replace(/"/g, '""') + '"'
+    : s;
+}
+
+/** Format a number as a plain decimal string for CSV (no ₹ symbol) */
+function numCSV(amount) {
+  return (parseFloat(amount) || 0).toFixed(2);
+}
+
+/** Download the currently displayed report as a CSV file */
+function downloadReportCSV() {
+  const reportType = document.getElementById('reportType')?.value || 'pl';
+  const fpo = FpoInfo.get();
+  let filename = 'report.csv';
+  let rows = [];
+
+  if (reportType === 'pl') {
+    filename = 'profit-loss-' + (fpo.financialYear || todayStr()).replace(/\//g, '-') + '.csv';
+    const salesRev  = Sales.totalRevenue();
+    const procCost  = Procurement.totalAmount();
+    const otherInc  = Income.total();
+    const expTotal  = Expenses.total();
+    const netProfit = salesRev + otherInc - procCost - expTotal;
+    const expBreakdown = groupBy(Expenses.getAll(), 'category');
+    const incBreakdown = groupBy(Income.getAll(), 'source');
+    rows = [
+      ['Profit & Loss Statement', fpo.name, 'FY ' + fpo.financialYear],
+      [],
+      ['Income', 'Amount (INR)'],
+      ['Sales Revenue', numCSV(salesRev)],
+      ...Object.entries(incBreakdown).map(([k, v]) => ['  ' + k, numCSV(v)]),
+      ['Other Income', numCSV(otherInc)],
+      ['Total Income', numCSV(salesRev + otherInc)],
+      [],
+      ['Expenditure', 'Amount (INR)'],
+      ['Procurement Cost', numCSV(procCost)],
+      ...Object.entries(expBreakdown).map(([k, v]) => ['  ' + k, numCSV(v)]),
+      ['Total Expenditure', numCSV(procCost + expTotal)],
+      [],
+      [netProfit >= 0 ? 'Net Profit' : 'Net Loss', numCSV(Math.abs(netProfit))],
+    ];
+
+  } else if (reportType === 'bs') {
+    filename = 'balance-sheet-' + todayStr() + '.csv';
+    const cashIn  = Sales.totalReceived() + Income.total();
+    const cashOut = Procurement.totalPaid() + Expenses.total();
+    const cashBal = cashIn - cashOut;
+    const recvProcurement = Procurement.totalAmount() - Procurement.totalPaid();
+    const recvSales       = Sales.totalRevenue() - Sales.totalReceived();
+    rows = [
+      ['Balance Sheet (Cash Basis)', fpo.name, 'As of ' + formatDate(todayStr())],
+      [],
+      ['Assets', 'Amount (INR)'],
+      ['Cash & Bank Balance', numCSV(cashBal)],
+      ['Receivables from Buyers', numCSV(recvSales)],
+      ['Total Assets', numCSV(cashBal + recvSales)],
+      [],
+      ['Liabilities', 'Amount (INR)'],
+      ['Payable to Farmers', numCSV(recvProcurement)],
+      ['Total Liabilities', numCSV(recvProcurement)],
+      [],
+      ['Net Position (Assets - Liabilities)', numCSV(cashBal + recvSales - recvProcurement)],
+    ];
+
+  } else if (reportType === 'ledger') {
+    filename = 'ledger-' + todayStr() + '.csv';
+    const allTxns = [
+      ...Sales.getAll().map(s => ({ date: s.date, description: 'Sale \u2013 ' + s.commodity + ' to ' + s.buyer, debit: 0, credit: parseFloat(s.totalAmount) || 0 })),
+      ...Procurement.getAll().map(p => {
+        const label = p.memberId ? (Members.getById(p.memberId)?.name || p.farmerName) : p.farmerName;
+        return { date: p.date, description: label ? 'Procurement \u2013 ' + p.commodity + ' (' + label + ')' : 'Procurement \u2013 ' + p.commodity, debit: parseFloat(p.totalAmount) || 0, credit: 0 };
+      }),
+      ...Expenses.getAll().map(e => ({ date: e.date, description: 'Expense \u2013 ' + e.category + (e.description ? ': ' + e.description : ''), debit: parseFloat(e.amount) || 0, credit: 0 })),
+      ...Income.getAll().map(i => ({ date: i.date, description: 'Income \u2013 ' + i.source + (i.description ? ': ' + i.description : ''), debit: 0, credit: parseFloat(i.amount) || 0 })),
+    ].sort((a, b) => new Date(a.date) - new Date(b.date));
+    let balance = 0;
+    rows = [
+      ['General Ledger', fpo.name],
+      ['Date', 'Description', 'Debit (INR)', 'Credit (INR)', 'Balance (INR)'],
+      ...allTxns.map(t => {
+        balance += t.credit - t.debit;
+        return [formatDate(t.date), t.description, t.debit > 0 ? numCSV(t.debit) : '', t.credit > 0 ? numCSV(t.credit) : '', numCSV(balance)];
+      }),
+    ];
+
+  } else if (reportType === 'member-stmt') {
+    filename = 'member-statements-' + todayStr() + '.csv';
+    const members  = Members.getAll();
+    const procList = Procurement.getAll();
+    rows = [
+      ['Member Statements', fpo.name],
+      ['Member Name', 'Member ID', 'Village', 'Date', 'Commodity', 'Quantity', 'Unit', 'Total (INR)', 'Paid (INR)', 'Due (INR)'],
+    ];
+    members.forEach(m => {
+      const procs = procList.filter(p => p.memberId === m.id);
+      if (procs.length === 0) {
+        rows.push([m.name, m.memberId || '', m.village || '', '(no transactions)', '', '', '', '', '', '']);
+      } else {
+        procs.forEach(p => {
+          const due = (parseFloat(p.totalAmount) || 0) - (parseFloat(p.paidAmount) || 0);
+          rows.push([m.name, m.memberId || '', m.village || '', formatDate(p.date), p.commodity, p.quantity, p.unit, numCSV(p.totalAmount), numCSV(p.paidAmount), numCSV(due)]);
+        });
+      }
+    });
+  }
+
+  const csvContent = rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+  // BOM prefix ensures Excel opens the file with correct UTF-8 encoding
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded successfully.');
+}
+
+/** Build a plain-text summary of the current report for sharing */
+function buildReportShareText(reportType, fpo) {
+  const sep = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500';
+  if (reportType === 'pl') {
+    const salesRev  = Sales.totalRevenue();
+    const procCost  = Procurement.totalAmount();
+    const otherInc  = Income.total();
+    const expTotal  = Expenses.total();
+    const netProfit = salesRev + otherInc - procCost - expTotal;
+    return '*' + fpo.name + '*\nProfit & Loss | FY ' + fpo.financialYear + '\n' + sep
+      + '\nSales Revenue:     ' + formatCurrency(salesRev)
+      + '\nOther Income:      ' + formatCurrency(otherInc)
+      + '\nTotal Income:      ' + formatCurrency(salesRev + otherInc)
+      + '\n' + sep
+      + '\nProcurement Cost:  ' + formatCurrency(procCost)
+      + '\nOther Expenses:    ' + formatCurrency(expTotal)
+      + '\nTotal Expenditure: ' + formatCurrency(procCost + expTotal)
+      + '\n' + sep
+      + '\n' + (netProfit >= 0 ? '\u2705 Net Profit: ' : '\u26a0\ufe0f Net Loss: ') + formatCurrency(Math.abs(netProfit));
+  }
+  if (reportType === 'bs') {
+    const cashIn  = Sales.totalReceived() + Income.total();
+    const cashOut = Procurement.totalPaid() + Expenses.total();
+    const cashBal = cashIn - cashOut;
+    const recvProcurement = Procurement.totalAmount() - Procurement.totalPaid();
+    const recvSales       = Sales.totalRevenue() - Sales.totalReceived();
+    const net = cashBal + recvSales - recvProcurement;
+    return '*' + fpo.name + '*\nBalance Sheet | ' + formatDate(todayStr()) + '\n' + sep
+      + '\nAssets'
+      + '\nCash & Bank Balance:     ' + formatCurrency(cashBal)
+      + '\nReceivables from Buyers: ' + formatCurrency(recvSales)
+      + '\nTotal Assets:            ' + formatCurrency(cashBal + recvSales)
+      + '\n' + sep
+      + '\nLiabilities'
+      + '\nPayable to Farmers:      ' + formatCurrency(recvProcurement)
+      + '\n' + sep
+      + '\nNet Position: ' + formatCurrency(net);
+  }
+  if (reportType === 'ledger') {
+    const txns = [
+      ...Sales.getAll().map(s => ({ date: s.date, label: 'Sale \u2013 ' + s.commodity, credit: parseFloat(s.totalAmount) || 0, debit: 0 })),
+      ...Procurement.getAll().map(p => ({ date: p.date, label: 'Procurement \u2013 ' + p.commodity, debit: parseFloat(p.totalAmount) || 0, credit: 0 })),
+      ...Expenses.getAll().map(e => ({ date: e.date, label: 'Expense \u2013 ' + e.category, debit: parseFloat(e.amount) || 0, credit: 0 })),
+      ...Income.getAll().map(i => ({ date: i.date, label: 'Income \u2013 ' + i.source, credit: parseFloat(i.amount) || 0, debit: 0 })),
+    ].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const lines = txns.map(t => formatDate(t.date) + ': ' + t.label + (t.credit > 0 ? ' +' + formatCurrency(t.credit) : ' \u2212' + formatCurrency(t.debit)));
+    return '*' + fpo.name + '*\nGeneral Ledger\n' + sep + (lines.length ? '\n' + lines.join('\n') : '\n(No transactions)');
+  }
+  if (reportType === 'member-stmt') {
+    const members  = Members.getAll();
+    const procList = Procurement.getAll();
+    const summaries = members.map(m => {
+      const procs     = procList.filter(p => p.memberId === m.id);
+      const totalSold = procs.reduce((s, p) => s + (parseFloat(p.totalAmount) || 0), 0);
+      const totalPaid = procs.reduce((s, p) => s + (parseFloat(p.paidAmount) || 0), 0);
+      return m.name + ': Sold ' + formatCurrency(totalSold) + ', Paid ' + formatCurrency(totalPaid) + ', Due ' + formatCurrency(totalSold - totalPaid);
+    });
+    return '*' + fpo.name + '*\nMember Statements\n' + sep + (summaries.length ? '\n' + summaries.join('\n') : '\n(No members)');
+  }
+  return fpo.name + ' \u2013 Report';
+}
+
+/** Share the current report via Web Share API, or copy to clipboard as fallback */
+function shareReport() {
+  const reportType = document.getElementById('reportType')?.value || 'pl';
+  const fpo  = FpoInfo.get();
+  const text = buildReportShareText(reportType, fpo);
+
+  // Prefer the native Web Share API (works on Android Chrome, iOS Safari, etc.)
+  if (navigator.share) {
+    navigator.share({ title: fpo.name + ' \u2013 Report', text }).catch(() => {
+      copyReportToClipboard(text);
+    });
+    return;
+  }
+
+  // Desktop fallback: copy to clipboard
+  copyReportToClipboard(text);
+}
+
+/** Copy the report text to the clipboard and show a confirmation toast */
+function copyReportToClipboard(text) {
+  const doToast = () => showToast('Report copied! Paste it in WhatsApp, Email, or SMS.');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(doToast).catch(() => { legacyCopy(text); doToast(); });
+  } else {
+    legacyCopy(text);
+    doToast();
+  }
+}
+
+/** Fallback clipboard copy using execCommand for older browsers */
+function legacyCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch (_) { /* ignore */ }
+  document.body.removeChild(ta);
+}
+
 /* ===== SETTINGS ===== */
 function renderSettings() {
   const info = FpoInfo.get();

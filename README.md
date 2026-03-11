@@ -90,7 +90,44 @@ Then open the app:
   - Balance Sheet (cash basis)
   - General Ledger (all transactions in chronological order)
   - Member Statements (individual farmer procurement and payment summary)
+  - **Share** any report via the native share sheet (mobile) or copy-to-clipboard (desktop)
+  - **Download as CSV** any report for use in Excel / Google Sheets
 - **Settings** – Configure FPO details (name, registration number, financial year, address). Export/import data as JSON backup.
+
+## 📤 Sharing Reports
+
+Yes — you can share any report with accountants, auditors, board members, or farmers using the **📱 Share** and **📥 Download CSV** buttons available on the Reports page toolbar.
+
+### 📱 Share button
+
+Builds a formatted text summary of the current report and:
+
+- **On mobile (Android / iOS)** — opens the **native share sheet** so you can send the report directly via WhatsApp, SMS, Email, or any other app installed on your device.
+- **On desktop** — copies the report text to your **clipboard**. A toast confirms *"Report copied! Paste it in WhatsApp, Email, or SMS."*  
+  Open WhatsApp Web, Gmail, or any messaging app and paste with **Ctrl+V** / **Cmd+V**.
+
+### 📥 Download CSV button
+
+Downloads the current report as a `.csv` file that opens in **Microsoft Excel**, **Google Sheets**, or any spreadsheet app:
+
+| Report | CSV filename |
+|--------|-------------|
+| Profit & Loss | `profit-loss-<FY>.csv` |
+| Balance Sheet | `balance-sheet-<date>.csv` |
+| General Ledger | `ledger-<date>.csv` |
+| Member Statements | `member-statements-<date>.csv` |
+
+Once downloaded, you can **attach the CSV to an email** or share it via WhatsApp as a file attachment.
+
+### 🖨️ Print / Save as PDF
+
+The **🖨️ Print** button opens the browser's print dialog. Choose **"Save as PDF"** in the print destination to create a PDF you can share as an attachment.
+
+> 💡 **Recommended workflow for sharing with others:**  
+> Mobile → use **📱 Share** to send directly via WhatsApp.  
+> Desktop → use **📥 Download CSV** and attach to an email, or use **📱 Share** to copy and paste into WhatsApp Web.
+
+---
 
 ## 📦 Where Is Data Stored?
 
@@ -180,7 +217,8 @@ The app includes a built-in export/import tool so you never lose your data.
 - Works entirely in the browser; no internet connection required after first load.
 - Data is stored in the browser's **localStorage** on your device (see [Where Is Data Stored?](#-where-is-data-stored) above).
 - Use **Export Data** in Settings to create JSON backups and **Import Data** to restore them.
-- The **Print** button on the Reports page prints the currently displayed report.
+- Use **📱 Share** on the Reports page to send a report via WhatsApp/Email, or **📥 Download CSV** to get a spreadsheet-ready file (see [Sharing Reports](#-sharing-reports)).
+- The **🖨️ Print** button on the Reports page prints the currently displayed report (choose *Save as PDF* in the print dialog to create a shareable PDF).
 
 ## Recommended Browsers
 
