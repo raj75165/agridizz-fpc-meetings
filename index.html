@@ -3,256 +3,816 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agridizz FPC Meetings</title>
+  <title>FPO Accounting – Agridizz</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- Sidebar / Nav -->
-  <nav id="sidebar">
-    <div class="sidebar-header">
-      <span class="logo">🌾 FPC Meetings</span>
-      <button id="menuToggle" class="menu-toggle" aria-label="Toggle menu">☰</button>
+
+<div class="app-wrapper">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h1 id="sidebarFpoName">Agridizz FPC</h1>
+      <span>Accounting &amp; Management</span>
     </div>
-    <ul class="nav-list">
-      <li><a href="#" class="nav-link active" data-page="dashboard">📊 Dashboard</a></li>
-      <li><a href="#" class="nav-link" data-page="meetings">📅 Meetings</a></li>
-      <li><a href="#" class="nav-link" data-page="members">👥 Members</a></li>
-      <li><a href="#" class="nav-link" data-page="settings">⚙️ Settings</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
+    <nav class="nav-menu">
+      <div class="nav-item active" data-page="dashboard">
+        <span class="icon">🏠</span> Dashboard
+      </div>
+      <div class="nav-item" data-page="members">
+        <span class="icon">👨‍🌾</span> Members
+      </div>
+      <div class="nav-item" data-page="procurement">
+        <span class="icon">🌾</span> Procurement
+      </div>
+      <div class="nav-item" data-page="sales">
+        <span class="icon">🛒</span> Sales
+      </div>
+      <div class="nav-item" data-page="expenses">
+        <span class="icon">📋</span> Expenses
+      </div>
+      <div class="nav-item" data-page="income">
+        <span class="icon">💵</span> Other Income
+      </div>
+      <div class="nav-item" data-page="reports">
+        <span class="icon">📊</span> Reports
+      </div>
+      <div class="nav-item" data-page="settings">
+        <span class="icon">⚙️</span> Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">Agridizz FPO Accounting v1.0</div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="flex items-center gap-8">
+        <button class="btn-menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+        <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="topbarDate"></span>
+      </div>
     </div>
-  </nav>
 
-  <!-- Overlay for mobile -->
-  <div id="overlay" class="overlay"></div>
+    <!-- Toast notification -->
+    <div id="toast" class="alert alert-success" style="display:none;position:fixed;top:70px;right:20px;z-index:999;min-width:240px;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.12)"></div>
 
-  <!-- Main Content -->
-  <main id="main">
+    <div class="content-area">
 
-    <!-- Dashboard Page -->
-    <section id="page-dashboard" class="page active">
-      <div class="page-header">
-        <h1>Dashboard</h1>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
-          <div class="stat-info">
-            <span class="stat-value" id="statTotalMeetings">0</span>
-            <span class="stat-label">Total Meetings</span>
+      <!-- ===== DASHBOARD PAGE ===== -->
+      <div class="page active" id="page-dashboard">
+        <div class="section-heading">Dashboard Overview</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Total Sales Revenue</div>
+            <div class="stat-value green" id="dash-total-revenue">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🌾</div>
+            <div class="stat-label">Procurement Cost</div>
+            <div class="stat-value orange" id="dash-total-procurement">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Total Expenses</div>
+            <div class="stat-value red" id="dash-total-expenses">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-label">Net Profit / Loss</div>
+            <div class="stat-value" id="dash-net-profit">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👨‍🌾</div>
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value" id="dash-members">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-label">Pending Farmer Payments</div>
+            <div class="stat-value orange" id="dash-pending-payments">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📥</div>
+            <div class="stat-label">Pending Receivables</div>
+            <div class="stat-value" id="dash-pending-recv">₹0.00</div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon">✅</div>
-          <div class="stat-info">
-            <span class="stat-value" id="statCompletedMeetings">0</span>
-            <span class="stat-label">Completed</span>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-title">
+              Monthly Revenue vs Procurement Cost
+              <span id="chartLegend" style="font-weight:400;font-size:0.78rem"></span>
+            </div>
+            <div class="bar-chart" id="barChart"></div>
           </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🔜</div>
-          <div class="stat-info">
-            <span class="stat-value" id="statUpcomingMeetings">0</span>
-            <span class="stat-label">Upcoming</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
-            <span class="stat-value" id="statTotalMembers">0</span>
-            <span class="stat-label">Members</span>
+          <div class="card">
+            <div class="card-title">Recent Transactions</div>
+            <div class="recent-txn" id="recentTxns">
+              <div class="empty-state"><div class="empty-icon">📊</div><p>No transactions yet.</p></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="section-card">
-        <h2>Recent Meetings</h2>
-        <div id="recentMeetingsList" class="item-list">
-          <p class="empty-msg">No meetings yet. <a href="#" data-page="meetings">Create one →</a></p>
+      <!-- ===== MEMBERS PAGE ===== -->
+      <div class="page" id="page-members">
+        <div class="section-heading">
+          Members
+          <div class="flex gap-8">
+            <span id="memberCount" class="text-muted" style="font-size:0.85rem;font-weight:400"></span>
+            <button class="btn btn-primary" onclick="openAddMember()">+ Add Member</button>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Meetings Page -->
-    <section id="page-meetings" class="page">
-      <div class="page-header">
-        <h1>Meetings</h1>
-        <button class="btn btn-primary" onclick="openMeetingModal()">+ New Meeting</button>
-      </div>
-
-      <div class="filter-bar">
-        <input type="text" id="meetingSearch" placeholder="Search meetings…" oninput="renderMeetings()" />
-        <select id="meetingFilter" onchange="renderMeetings()">
-          <option value="all">All</option>
-          <option value="upcoming">Upcoming</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
-
-      <div id="meetingsList" class="item-list">
-        <p class="empty-msg">No meetings found.</p>
-      </div>
-    </section>
-
-    <!-- Members Page -->
-    <section id="page-members" class="page">
-      <div class="page-header">
-        <h1>Members</h1>
-        <button class="btn btn-primary" onclick="openMemberModal()">+ Add Member</button>
-      </div>
-
-      <div class="filter-bar">
-        <input type="text" id="memberSearch" placeholder="Search members…" oninput="renderMembers()" />
-      </div>
-
-      <div id="membersList" class="item-list">
-        <p class="empty-msg">No members found.</p>
-      </div>
-    </section>
-
-    <!-- Settings Page -->
-    <section id="page-settings" class="page">
-      <div class="page-header">
-        <h1>Settings</h1>
-      </div>
-
-      <div class="section-card">
-        <h2>Data Management</h2>
-        <p class="muted">Export or import your meetings and members data as JSON.</p>
-        <div class="btn-group">
-          <button class="btn btn-secondary" onclick="exportData()">📤 Export Data</button>
-          <label class="btn btn-secondary btn-file-label">
-            📥 Import Data
-            <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none" />
-          </label>
-        </div>
-        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
-      </div>
-
-      <div class="section-card">
-        <h2>Setup Files</h2>
-        <p class="muted">Download the setup file for your operating system to easily open this app.</p>
-        <div class="btn-group">
-          <button class="btn btn-download" onclick="downloadSetupFile()">⬇ Download Setup File</button>
-          <button class="btn btn-secondary" onclick="downloadSetupFile('bat')">⬇ Download for Windows (.bat)</button>
-          <button class="btn btn-secondary" onclick="downloadSetupFile('sh')">⬇ Download for Mac/Linux (.sh)</button>
+        <div class="card">
+          <div class="filter-row">
+            <input type="search" id="memberSearch" placeholder="🔍 Search by name, village, ID…" oninput="renderMembers()" />
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Member ID</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Village</th>
+                  <th>Land (acres)</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="membersTable">
+                <tr><td colspan="8" class="text-center"><div class="empty-state"><div class="empty-icon">👨‍🌾</div><p>No members added yet.</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div class="section-card">
-        <h2>About</h2>
-        <p class="muted">Agridizz FPC Meetings — v1.0.0</p>
-        <p class="muted">Offline-first meeting management for Farmer Producer Companies.</p>
-      </div>
-    </section>
+      <!-- ===== PROCUREMENT PAGE ===== -->
+      <div class="page" id="page-procurement">
+        <div class="section-heading">
+          Procurement
+          <button class="btn btn-primary" onclick="openAddProcurement()">+ Add Procurement</button>
+        </div>
 
-  </main>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card">
+            <div class="stat-label">Total Procurement Value</div>
+            <div class="stat-value orange" id="procTotalCost">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Amount Paid to Farmers</div>
+            <div class="stat-value green" id="procTotalPaid">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Payments</div>
+            <div class="stat-value red" id="procTotalDue">₹0.00</div>
+          </div>
+        </div>
 
-  <!-- Meeting Modal -->
-  <div id="meetingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="meetingModalTitle">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="meetingModalTitle">New Meeting</h2>
-        <button class="modal-close" onclick="closeModal('meetingModal')" aria-label="Close">✕</button>
+        <div class="card">
+          <div class="filter-row">
+            <input type="date" id="procFilterDate" onchange="renderProcurement()" title="Filter by date" />
+            <input type="text" id="procFilterCom" placeholder="🔍 Filter by commodity…" oninput="renderProcurement()" />
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('procFilterDate').value='';document.getElementById('procFilterCom').value='';renderProcurement()">Clear</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Commodity</th>
+                  <th>Farmer</th>
+                  <th class="text-right">Quantity</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Total</th>
+                  <th class="text-right">Paid</th>
+                  <th class="text-right">Due</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="procurementTable"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      <form id="meetingForm" onsubmit="saveMeeting(event)">
-        <input type="hidden" id="meetingId" />
+
+      <!-- ===== SALES PAGE ===== -->
+      <div class="page" id="page-sales">
+        <div class="section-heading">
+          Sales
+          <button class="btn btn-success" onclick="openAddSale()">+ Record Sale</button>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card">
+            <div class="stat-label">Total Sales Revenue</div>
+            <div class="stat-value green" id="salesTotalRev">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Amount Received</div>
+            <div class="stat-value green" id="salesTotalRecv">₹0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Receivables</div>
+            <div class="stat-value red" id="salesTotalDue">₹0.00</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="filter-row">
+            <input type="date" id="saleFilterDate" onchange="renderSales()" title="Filter by date" />
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('saleFilterDate').value='';renderSales()">Clear</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Commodity</th>
+                  <th>Buyer</th>
+                  <th class="text-right">Quantity</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Total</th>
+                  <th class="text-right">Received</th>
+                  <th class="text-right">Due</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="salesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== EXPENSES PAGE ===== -->
+      <div class="page" id="page-expenses">
+        <div class="section-heading">
+          Expenses
+          <div class="flex gap-8 items-center">
+            <span class="text-muted" style="font-size:0.85rem;font-weight:400">Total: <strong id="expensesTotal">₹0.00</strong></span>
+            <button class="btn btn-danger" onclick="openAddExpense()">+ Add Expense</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th class="text-right">Amount</th>
+                  <th>Payment Mode</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="expensesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== OTHER INCOME PAGE ===== -->
+      <div class="page" id="page-income">
+        <div class="section-heading">
+          Other Income
+          <div class="flex gap-8 items-center">
+            <span class="text-muted" style="font-size:0.85rem;font-weight:400">Total: <strong id="incomeTotal">₹0.00</strong></span>
+            <button class="btn btn-success" onclick="openAddIncome()">+ Add Income</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Source</th>
+                  <th>Description</th>
+                  <th class="text-right">Amount</th>
+                  <th>Payment Mode</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="incomeTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REPORTS PAGE ===== -->
+      <div class="page" id="page-reports">
+        <div class="section-heading">
+          Reports
+          <div class="flex gap-8 items-center">
+            <select id="reportType" onchange="renderReports()" style="border:1px solid #e2e8f0;border-radius:6px;padding:7px 12px;font-size:0.875rem">
+              <option value="pl">Profit &amp; Loss</option>
+              <option value="bs">Balance Sheet</option>
+              <option value="ledger">General Ledger</option>
+              <option value="member-stmt">Member Statements</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="downloadReportCSV()">📥 Download CSV</button>
+            <button class="btn btn-outline btn-sm" onclick="shareReport()">📱 Share</button>
+            <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>
+          </div>
+        </div>
+        <div id="reportContent"></div>
+      </div>
+
+      <!-- ===== SETTINGS PAGE ===== -->
+      <div class="page" id="page-settings">
+        <div class="section-heading">Settings</div>
+
+        <div class="card">
+          <div class="card-title">FPO / FPC Information</div>
+          <form id="settingsForm" onsubmit="return false">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>FPO / FPC Name</label>
+                <input type="text" name="name" placeholder="e.g. Agridizz FPC Ltd" />
+              </div>
+              <div class="form-group">
+                <label>Registration Number</label>
+                <input type="text" name="regNo" placeholder="CIN / Registration No." />
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" name="phone" placeholder="+91 9876543210" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="info@fpc.org" />
+              </div>
+              <div class="form-group">
+                <label>Financial Year</label>
+                <input type="text" name="financialYear" placeholder="e.g. 2024-2025" />
+              </div>
+            </div>
+            <div class="form-group mt-16">
+              <label>Address</label>
+              <textarea name="address" placeholder="Full address of FPO/FPC"></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Data Management</div>
+          <p style="font-size:0.875rem;color:#718096;margin-bottom:16px">
+            Export your data as a JSON backup, or import a previously exported file to restore data.
+          </p>
+          <div class="flex gap-8">
+            <button class="btn btn-primary" onclick="exportData()">📤 Export Data</button>
+            <label class="btn btn-secondary" style="cursor:pointer">
+              📥 Import Data
+              <input type="file" accept=".json" onchange="importData(event)" style="display:none" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="color:#c53030">⚠️ Danger Zone</div>
+          <p style="font-size:0.875rem;color:#718096;margin-bottom:16px">
+            Permanently clear all data. This action cannot be undone. Please export your data first.
+          </p>
+          <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+</div><!-- /app-wrapper -->
+
+<!-- ============================= MODALS ============================= -->
+
+<!-- MEMBER MODAL -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="memberFormTitle">Add Member</h3>
+      <button class="modal-close" onclick="closeModal('memberModal')">✕</button>
+    </div>
+    <form id="memberForm" onsubmit="return false">
+      <input type="hidden" id="memberFormId" value="" />
+      <div class="form-grid">
         <div class="form-group">
-          <label for="meetingTitle">Title <span class="required">*</span></label>
-          <input type="text" id="meetingTitle" required placeholder="e.g. Monthly Board Meeting" />
+          <label>Member ID *</label>
+          <input type="text" name="memberId" placeholder="e.g. MBR-001" />
         </div>
         <div class="form-group">
-          <label for="meetingDate">Date <span class="required">*</span></label>
-          <input type="date" id="meetingDate" required />
+          <label>Full Name *</label>
+          <input type="text" name="name" placeholder="Farmer's full name" required />
         </div>
         <div class="form-group">
-          <label for="meetingTime">Time</label>
-          <input type="time" id="meetingTime" />
+          <label>Phone</label>
+          <input type="tel" name="phone" placeholder="+91 XXXXXXXXXX" />
         </div>
         <div class="form-group">
-          <label for="meetingLocation">Location</label>
-          <input type="text" id="meetingLocation" placeholder="e.g. Village Hall, Room 2" />
+          <label>Village</label>
+          <input type="text" name="village" placeholder="Village name" />
         </div>
         <div class="form-group">
-          <label for="meetingAgenda">Agenda</label>
-          <textarea id="meetingAgenda" rows="3" placeholder="Meeting agenda or notes…"></textarea>
+          <label>District</label>
+          <input type="text" name="district" placeholder="District" />
         </div>
         <div class="form-group">
-          <label for="meetingStatus">Status</label>
-          <select id="meetingStatus">
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+          <label>Land Holding (acres)</label>
+          <input type="number" name="landHolding" min="0" step="0.1" placeholder="e.g. 2.5" />
+        </div>
+        <div class="form-group">
+          <label>Aadhaar Number</label>
+          <input type="text" name="aadhaar" placeholder="XXXX XXXX XXXX" maxlength="14" />
+        </div>
+        <div class="form-group">
+          <label>Bank Account No.</label>
+          <input type="text" name="bankAccount" placeholder="Account number" />
+        </div>
+        <div class="form-group">
+          <label>IFSC Code</label>
+          <input type="text" name="ifsc" placeholder="e.g. SBIN0001234" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="meetingAttendees">Attendees</label>
-          <div id="attendeeCheckboxes" class="checkbox-list"></div>
+          <label>Join Date</label>
+          <input type="date" name="joinDate" />
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('meetingModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Meeting</button>
-        </div>
-      </form>
+      </div>
+      <div class="form-group mt-16">
+        <label>Crops Grown</label>
+        <input type="text" name="crops" placeholder="e.g. Rice, Wheat, Vegetables" />
+      </div>
+    </form>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveMember()">💾 Save Member</button>
+      <button class="btn btn-secondary" onclick="closeModal('memberModal')">Cancel</button>
     </div>
   </div>
+</div>
 
-  <!-- Member Modal -->
-  <div id="memberModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="memberModalTitle">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="memberModalTitle">Add Member</h2>
-        <button class="modal-close" onclick="closeModal('memberModal')" aria-label="Close">✕</button>
+<!-- PROCUREMENT MODAL -->
+<div class="modal-overlay" id="procModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="procFormTitle">Add Procurement</h3>
+      <button class="modal-close" onclick="closeModal('procModal')">✕</button>
+    </div>
+    <form id="procurementForm" onsubmit="return false">
+      <input type="hidden" id="procFormId" value="" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label>Member / Farmer</label>
+          <select name="memberId" id="procMemberId"></select>
+        </div>
+        <div class="form-group">
+          <label>Farmer Name (if not member)</label>
+          <input type="text" name="farmerName" placeholder="Name if not in members list" />
+        </div>
+        <div class="form-group">
+          <label>Commodity *</label>
+          <input type="text" name="commodity" placeholder="e.g. Paddy, Wheat, Tomato" required />
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" id="procQty" min="0" step="0.01" placeholder="0.00" oninput="calcProcTotal()" />
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select name="unit">
+            <option>Kg</option>
+            <option>Quintal</option>
+            <option>Tonne</option>
+            <option>Bag</option>
+            <option>Litre</option>
+            <option>Dozen</option>
+            <option>Piece</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Rate per Unit (₹)</label>
+          <input type="number" name="pricePerUnit" id="procPrice" min="0" step="0.01" placeholder="0.00" oninput="calcProcTotal()" />
+        </div>
+        <div class="form-group">
+          <label>Total Amount (₹)</label>
+          <input type="number" name="totalAmount" id="procTotal" min="0" step="0.01" placeholder="Auto-calculated" />
+        </div>
+        <div class="form-group">
+          <label>Amount Paid (₹)</label>
+          <input type="number" name="paidAmount" min="0" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select name="paymentMode">
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>UPI</option>
+            <option>Cheque</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Grade / Quality</label>
+          <input type="text" name="grade" placeholder="e.g. Grade A, FAQ" />
+        </div>
+        <div class="form-group">
+          <label>Moisture Content (%)</label>
+          <input type="number" name="moisture" min="0" max="100" step="0.1" placeholder="e.g. 14" />
+        </div>
       </div>
-      <form id="memberForm" onsubmit="saveMember(event)">
-        <input type="hidden" id="memberId" />
-        <div class="form-group">
-          <label for="memberName">Full Name <span class="required">*</span></label>
-          <input type="text" id="memberName" required placeholder="e.g. Ramesh Kumar" />
-        </div>
-        <div class="form-group">
-          <label for="memberPhone">Phone</label>
-          <input type="tel" id="memberPhone" placeholder="e.g. 9876543210" autocomplete="tel" />
-        </div>
-        <div class="form-group">
-          <label for="memberEmail">Email</label>
-          <input type="email" id="memberEmail" placeholder="e.g. ramesh@example.com" autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label for="memberRole">Role</label>
-          <input type="text" id="memberRole" placeholder="e.g. Director, Treasurer" />
-        </div>
-        <div class="form-group">
-          <label for="memberVillage">Village / Location</label>
-          <input type="text" id="memberVillage" placeholder="e.g. Nashik" />
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Member</button>
-        </div>
-      </form>
+      <div class="form-group mt-16">
+        <label>Notes</label>
+        <textarea name="notes" placeholder="Any additional notes…"></textarea>
+      </div>
+    </form>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveProcurement()">💾 Save</button>
+      <button class="btn btn-secondary" onclick="closeModal('procModal')">Cancel</button>
     </div>
   </div>
+</div>
 
-  <!-- Confirm Dialog -->
-  <div id="confirmModal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-content modal-sm">
-      <div class="modal-header">
-        <h2 id="confirmTitle">Confirm</h2>
-        <button class="modal-close" onclick="closeModal('confirmModal')" aria-label="Close">✕</button>
+<!-- SALE MODAL -->
+<div class="modal-overlay" id="saleModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="saleFormTitle">Record Sale</h3>
+      <button class="modal-close" onclick="closeModal('saleModal')">✕</button>
+    </div>
+    <form id="salesForm" onsubmit="return false">
+      <input type="hidden" id="saleFormId" value="" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label>Commodity *</label>
+          <input type="text" name="commodity" placeholder="e.g. Paddy, Wheat" required />
+        </div>
+        <div class="form-group">
+          <label>Buyer Name *</label>
+          <input type="text" name="buyer" placeholder="Buyer / trader name" />
+        </div>
+        <div class="form-group">
+          <label>Buyer Phone</label>
+          <input type="tel" name="buyerPhone" placeholder="+91 XXXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" id="saleQty" min="0" step="0.01" placeholder="0.00" oninput="calcSaleTotal()" />
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select name="unit">
+            <option>Kg</option>
+            <option>Quintal</option>
+            <option>Tonne</option>
+            <option>Bag</option>
+            <option>Litre</option>
+            <option>Dozen</option>
+            <option>Piece</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Rate per Unit (₹)</label>
+          <input type="number" name="pricePerUnit" id="salePrice" min="0" step="0.01" placeholder="0.00" oninput="calcSaleTotal()" />
+        </div>
+        <div class="form-group">
+          <label>Total Amount (₹)</label>
+          <input type="number" name="totalAmount" id="saleTotal" min="0" step="0.01" placeholder="Auto-calculated" />
+        </div>
+        <div class="form-group">
+          <label>Amount Received (₹)</label>
+          <input type="number" name="receivedAmount" min="0" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select name="paymentMode">
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>UPI</option>
+            <option>Cheque</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Market / Mandi</label>
+          <input type="text" name="market" placeholder="Market or Mandi name" />
+        </div>
+        <div class="form-group">
+          <label>Invoice Number</label>
+          <input type="text" name="invoiceNo" placeholder="INV-XXXX" />
+        </div>
       </div>
-      <p id="confirmMessage" class="confirm-msg"></p>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Cancel</button>
-        <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+      <div class="form-group mt-16">
+        <label>Notes</label>
+        <textarea name="notes" placeholder="Any additional notes…"></textarea>
       </div>
+    </form>
+    <div class="form-actions">
+      <button class="btn btn-success" onclick="saveSale()">💾 Save Sale</button>
+      <button class="btn btn-secondary" onclick="closeModal('saleModal')">Cancel</button>
     </div>
   </div>
+</div>
 
-  <!-- Toast Container -->
-  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+<!-- EXPENSE MODAL -->
+<div class="modal-overlay" id="expenseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="expFormTitle">Add Expense</h3>
+      <button class="modal-close" onclick="closeModal('expenseModal')">✕</button>
+    </div>
+    <form id="expenseForm" onsubmit="return false">
+      <input type="hidden" id="expFormId" value="" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category" required>
+            <option value="">— Select —</option>
+            <option>Salary &amp; Wages</option>
+            <option>Transportation</option>
+            <option>Storage / Warehouse</option>
+            <option>Packaging</option>
+            <option>Office &amp; Admin</option>
+            <option>Equipment &amp; Repairs</option>
+            <option>Marketing &amp; Promotion</option>
+            <option>Bank Charges</option>
+            <option>Government Fees</option>
+            <option>Utilities</option>
+            <option>Input Supplies</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" name="amount" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select name="paymentMode">
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>UPI</option>
+            <option>Cheque</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Receipt / Voucher No.</label>
+          <input type="text" name="voucherNo" placeholder="VCH-XXXX" />
+        </div>
+      </div>
+      <div class="form-group mt-16">
+        <label>Description</label>
+        <textarea name="description" placeholder="Details of the expense…"></textarea>
+      </div>
+    </form>
+    <div class="form-actions">
+      <button class="btn btn-danger" onclick="saveExpense()">💾 Save Expense</button>
+      <button class="btn btn-secondary" onclick="closeModal('expenseModal')">Cancel</button>
+    </div>
+  </div>
+</div>
 
-  <script src="js/app.js"></script>
+<!-- INCOME MODAL -->
+<div class="modal-overlay" id="incomeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="incFormTitle">Add Income Entry</h3>
+      <button class="modal-close" onclick="closeModal('incomeModal')">✕</button>
+    </div>
+    <form id="incomeForm" onsubmit="return false">
+      <input type="hidden" id="incFormId" value="" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" required />
+        </div>
+        <div class="form-group">
+          <label>Source *</label>
+          <select name="source" required>
+            <option value="">— Select —</option>
+            <option>Government Grant</option>
+            <option>Subsidy</option>
+            <option>Membership Fee</option>
+            <option>Interest Income</option>
+            <option>Service Charges</option>
+            <option>Rent Income</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" name="amount" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select name="paymentMode">
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>UPI</option>
+            <option>Cheque</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Reference No.</label>
+          <input type="text" name="refNo" placeholder="Reference or voucher number" />
+        </div>
+      </div>
+      <div class="form-group mt-16">
+        <label>Description</label>
+        <textarea name="description" placeholder="Details of the income…"></textarea>
+      </div>
+    </form>
+    <div class="form-actions">
+      <button class="btn btn-success" onclick="saveIncome()">💾 Save Income</button>
+      <button class="btn btn-secondary" onclick="closeModal('incomeModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= SCRIPTS ============================= -->
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+<script>
+  /* ===== Helper openers that reset forms ===== */
+  function openAddMember() {
+    document.getElementById('memberForm').reset();
+    document.getElementById('memberFormId').value = '';
+    document.getElementById('memberFormTitle').textContent = 'Add Member';
+    openModal('memberModal');
+  }
+
+  function openAddProcurement() {
+    document.getElementById('procurementForm').reset();
+    document.getElementById('procFormId').value = '';
+    document.getElementById('procFormTitle').textContent = 'Add Procurement';
+    document.getElementById('procurementForm').querySelector('[name="date"]').value = todayStr();
+    populateMemberSelect('procMemberId');
+    openModal('procModal');
+  }
+
+  function openAddSale() {
+    document.getElementById('salesForm').reset();
+    document.getElementById('saleFormId').value = '';
+    document.getElementById('saleFormTitle').textContent = 'Record Sale';
+    document.getElementById('salesForm').querySelector('[name="date"]').value = todayStr();
+    openModal('saleModal');
+  }
+
+  function openAddExpense() {
+    document.getElementById('expenseForm').reset();
+    document.getElementById('expFormId').value = '';
+    document.getElementById('expFormTitle').textContent = 'Add Expense';
+    document.getElementById('expenseForm').querySelector('[name="date"]').value = todayStr();
+    openModal('expenseModal');
+  }
+
+  function openAddIncome() {
+    document.getElementById('incomeForm').reset();
+    document.getElementById('incFormId').value = '';
+    document.getElementById('incFormTitle').textContent = 'Add Income Entry';
+    document.getElementById('incomeForm').querySelector('[name="date"]').value = todayStr();
+    openModal('incomeModal');
+  }
+
+  function clearAllData() {
+    if (!confirm('⚠️ This will permanently delete ALL data. Are you sure? This cannot be undone.')) return;
+    if (!confirm('Final confirmation: Delete all FPO data?')) return;
+    Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+    showToast('All data cleared. Reloading…');
+    setTimeout(() => location.reload(), 1200);
+  }
+</script>
+
 </body>
 </html>
